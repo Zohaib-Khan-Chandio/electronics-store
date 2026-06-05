@@ -64,17 +64,15 @@
 
         <p class="section-title">Ordered Items</p>
         <table class="table table-bordered mb-4">
-          <thead class="table-dark">
-           <thead>
-  <tr>
-    <th>Product</th>
-    <th>Quantity</th>
-    <th class="text-end">Price</th>
-  </tr>
-</thead>
-          </thead>
-          <tbody>
-         {% for item in order['items'] %}
+        <thead class="table-dark">
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th class="text-end">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order['items'] %}
   <tr>
     <td>{{ item.name }}</td>
     <td>{{ item.quantity }}</td>
