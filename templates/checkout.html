@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .card-input { letter-spacing: 2px; }
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #555;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .payment-icons img { height: 28px; margin-right: 6px; opacity: 0.8; }
+  </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark px-4">
+  <a class="navbar-brand fw-bold" href="/">ElectroStore</a>
+</nav>
+
+<div class="container mt-5 mb-5">
+  <div class="row g-4">
+
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3">
+        <p class="section-title">Order Summary</p>
+        <ul class="list-group list-group-flush">
+          {% for item in cart_items %}
+          <li class="list-group-item px-0 d-flex justify-content-between">
+            <span>{{ item.name }}</span>
+            <strong>Rs {{ item.price }}</strong>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="d-flex justify-content-between mt-3 pt-2 border-top">
+          <strong>Total</strong>
+          <strong class="text-success">Rs {{ total }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <form action="/place-order" method="POST" onsubmit="return validateCard()">
+
+        <div class="card shadow-sm p-4 mb-4">
+          <p class="section-title">Delivery Details</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" placeholder="john@email.com" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Delivery Address</label>
+              <textarea name="address" class="form-control" rows="2" placeholder="Street, City, Country" required></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <p class="section-title mb-0">Payment Details</p>
+            <div class="payment-icons">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Cardholder Name</label>
+            <input type="text" id="card_name" class="form-control" placeholder="Name on card" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Card Number</label>
+            <input type="text" id="card_number" class="form-control card-input"
+              placeholder="1234 5678 9012 3456" maxlength="19" required
+              oninput="formatCardNumber(this)">
+            <div id="card_number_error" class="text-danger small mt-1" style="display:none;">
+              Please enter a valid 16-digit card number.
+            </div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Expiry Date</label>
+              <input type="text" id="expiry" class="form-control card-input"
+                placeholder="MM / YY" maxlength="7" required
+                oninput="formatExpiry(this)">
+              <div id="expiry_error" class="text-danger small mt-1" style="display:none;">
+                Please enter a valid expiry date.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">CVV</label>
+              <input type="password" id="cvv" class="form-control card-input"
+                placeholder="123" maxlength="3" required>
+              <div id="cvv_error" class="text-danger small mt-1" style="display:none;">
+                CVV must be 3 digits.
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <button type="submit" class="btn btn-dark w-100 py-2">Confirm & Place Order</button>
+          </div>
+          <p class="text-muted text-center small mt-3">Your payment information is secure and encrypted.</p>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function formatCardNumber(input) {
+    let value = input.value.replace(/\D/g, '').substring(0, 16);
+    input.value = value.match(/.{1,4}/g)?.join(' ') || value;
+  }
+  function formatExpiry(input) {
+    let value = input.value.replace(/\D/g, '').substring(0, 4);
+    if (value.length >= 3) {
+      input.value = value.substring(0, 2) + ' / ' + value.substring(2);
+    } else {
+      input.value = value;
+    }
+  }
+  function validateCard() {
+    let valid = true;
+    let cardNum = document.getElementById('card_number').value.replace(/\s/g, '');
+    let cardError = document.getElementById('card_number_error');
+    if (cardNum.length !== 16) { cardError.style.display = 'block'; valid = false; }
+    else { cardError.style.display = 'none'; }
+    let expiry = document.getElementById('expiry').value;
+    let expiryError = document.getElementById('expiry_error');
+    if (expiry.length < 7) { expiryError.style.display = 'block'; valid = false; }
+    else { expiryError.style.display = 'none'; }
+    let cvv = document.getElementById('cvv').value;
+    let cvvError = document.getElementById('cvv_error');
+    if (cvv.length !== 3) { cvvError.style.display = 'block'; valid = false; }
+    else { cvvError.style.display = 'none'; }
+    return valid;
+  }
+</script>
+</body>
+</html>

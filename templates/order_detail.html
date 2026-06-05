@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Detail</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #777;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark px-4">
+  <a class="navbar-brand fw-bold" href="/">ElectroStore — Admin</a>
+  <a href="/admin" class="btn btn-outline-light btn-sm">Back to Admin</a>
+</nav>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card shadow-sm p-4">
+
+        <h5 class="mb-4">Order Details</h5>
+
+        <p class="section-title">Customer Information</p>
+        <table class="table table-sm table-borderless mb-4">
+          <tr>
+            <td class="text-muted" style="width:140px">Full Name</td>
+            <td><strong>{{ order.name }}</strong></td>
+          </tr>
+          <tr>
+            <td class="text-muted">Email</td>
+            <td>{{ order.email }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Address</td>
+            <td>{{ order.address }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Order Date</td>
+            <td>{{ order.date }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Status</td>
+            <td>
+              <span class="badge
+                {% if order.status == 'Delivered' %}bg-success
+                {% elif order.status == 'Processing' %}bg-warning text-dark
+                {% else %}bg-secondary{% endif %}">
+                {{ order.status }}
+              </span>
+            </td>
+          </tr>
+        </table>
+
+        <p class="section-title">Ordered Items</p>
+        <table class="table table-bordered mb-4">
+          <thead class="table-dark">
+           <thead>
+  <tr>
+    <th>Product</th>
+    <th>Quantity</th>
+    <th class="text-end">Price</th>
+  </tr>
+</thead>
+          </thead>
+          <tbody>
+         {% for item in order['items'] %}
+  <tr>
+    <td>{{ item.name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>${{ item.price }}</td>
+  </tr>
+{% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="text-end"><strong>Total</strong></td>
+              <td class="text-end text-success"><strong>${{ order.total }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Update Status -->
+        <p class="section-title">Update Order Status</p>
+        <form action="/admin/update-status/{{ order._id }}" method="POST" class="d-flex gap-2">
+          <select name="status" class="form-select">
+            <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Processing" {% if order.status == 'Processing' %}selected{% endif %}>Processing</option>
+            <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+          </select>
+          <button type="submit" class="btn btn-dark px-4">Update</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
